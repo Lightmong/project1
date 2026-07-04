@@ -58,7 +58,7 @@ def judge(user, computer):
 # =======================
 if not st.session_state.game_started:
 
-    st.title("✊ 가위바위보 (즉시 반영 버전)")
+    st.title("✊ 가위바위보 ")
 
     if st.button("🎮 게임시작"):
         st.session_state.game_started = True
