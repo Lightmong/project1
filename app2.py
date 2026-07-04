@@ -4,6 +4,14 @@ import random
 # -----------------------
 # 초기 상태
 # -----------------------
+st.markdown("""
+<style>
+.stApp{
+    background-color:#E3F2FD;
+}
+</style>
+""", unsafe_allow_html=True)
+
 if "game_started" not in st.session_state:
     st.session_state.game_started = False
 
