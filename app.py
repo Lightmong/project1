@@ -17,7 +17,7 @@ if "balloons_shown" not in st.session_state:
 st.markdown("""
 <style>
 .stApp {
-    background-color: #121212;
+    background-color: #2B2B2B;
     color: white;
 }
 
