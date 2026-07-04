@@ -1,10 +1,9 @@
 import streamlit as st
 import math
-import sympy as sp
 
-# -----------------------------
-# 상태 초기화
-# -----------------------------
+# -------------------------
+# 상태
+# -------------------------
 if "expr" not in st.session_state:
     st.session_state.expr = ""
 
@@ -12,9 +11,33 @@ if "result" not in st.session_state:
     st.session_state.result = ""
 
 
-# -----------------------------
-# CSS (중앙 카드 UI)
-# -----------------------------
+# -------------------------
+# 수식 안전 처리
+# -------------------------
+def safe_eval(expr):
+    try:
+        expr = expr.replace("^", "**")
+
+        allowed = {
+            "sin": math.sin,
+            "cos": math.cos,
+            "tan": math.tan,
+            "log": math.log10,
+            "ln": math.log,
+            "sqrt": math.sqrt,
+            "pi": math.pi,
+            "e": math.e,
+            "abs": abs
+        }
+
+        return eval(expr, {"__builtins__": None}, allowed)
+    except:
+        return "Error"
+
+
+# -------------------------
+# UI 스타일
+# -------------------------
 st.markdown("""
 <style>
 .stApp {
@@ -24,66 +47,35 @@ st.markdown("""
 .calculator {
     width: 420px;
     margin: auto;
-    margin-top: 60px;
+    margin-top: 40px;
     padding: 20px;
     background: white;
     border-radius: 20px;
-    box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
 }
 
 .display {
-    background: #222;
-    color: white;
+    background: #111;
+    color: #0f0;
     padding: 20px;
+    font-size: 26px;
     border-radius: 12px;
-    font-size: 28px;
     text-align: right;
-    min-height: 60px;
+    min-height: 70px;
 }
 
-.btn button {
-    width: 100%;
-    height: 60px;
-    font-size: 20px;
-    border-radius: 10px;
+button {
+    height: 55px !important;
+    font-size: 18px !important;
+    border-radius: 10px !important;
 }
 </style>
 """, unsafe_allow_html=True)
 
 
-# -----------------------------
-# 계산 함수
-# -----------------------------
-def calculate(expr):
-    try:
-        return eval(expr)
-    except:
-        return "Error"
-
-
-# -----------------------------
-# UI 시작
-# -----------------------------
-st.markdown('<div class="calculator">', unsafe_allow_html=True)
-
-# =========================
-# 결과 화면 (위쪽)
-# =========================
-st.markdown(f"""
-<div class="display">
-{st.session_state.expr if st.session_state.expr else "0"}
-<br>
-<span style="font-size:18px; color:#4CAF50;">
-{st.session_state.result}
-</span>
-</div>
-""", unsafe_allow_html=True)
-
-st.write("")
-
-# =========================
-# 버튼 입력 함수
-# =========================
+# -------------------------
+# 버튼 함수
+# -------------------------
 def press(val):
     st.session_state.expr += str(val)
 
@@ -92,61 +84,93 @@ def clear():
     st.session_state.result = ""
 
 def equal():
-    st.session_state.result = str(calculate(st.session_state.expr))
+    st.session_state.result = str(safe_eval(st.session_state.expr))
 
 
-# =========================
-# 버튼 UI
-# =========================
+# -------------------------
+# UI 시작
+# -------------------------
+st.markdown('<div class="calculator">', unsafe_allow_html=True)
 
-col1, col2, col3, col4 = st.columns(4)
+# 디스플레이
+st.markdown(f"""
+<div class="display">
+{st.session_state.expr}<br>
+<span style="color:#00ff99; font-size:20px;">
+{st.session_state.result}
+</span>
+</div>
+""", unsafe_allow_html=True)
 
-with col1:
-    st.button("7", on_click=press, args=("7",))
-    st.button("4", on_click=press, args=("4",))
-    st.button("1", on_click=press, args=("1",))
-    st.button("0", on_click=press, args=("0",))
+st.write("")
 
-with col2:
-    st.button("8", on_click=press, args=("8",))
-    st.button("5", on_click=press, args=("5",))
-    st.button("2", on_click=press, args=("2",))
-    st.button(".", on_click=press, args=(".",))
+# -------------------------
+# 숫자 + 기본 연산
+# -------------------------
+row1 = st.columns(4)
+row2 = st.columns(4)
+row3 = st.columns(4)
+row4 = st.columns(4)
 
-with col3:
-    st.button("9", on_click=press, args=("9",))
-    st.button("6", on_click=press, args=("6",))
-    st.button("3", on_click=press, args=("3",))
-    st.button("=", on_click=equal)
+# 1줄
+with row1[0]: st.button("7", on_click=press, args=("7",))
+with row1[1]: st.button("8", on_click=press, args=("8",))
+with row1[2]: st.button("9", on_click=press, args=("9",))
+with row1[3]: st.button("/", on_click=press, args=("/"))
 
-with col4:
-    st.button("+", on_click=press, args=("+",))
-    st.button("-", on_click=press, args=("-"))
-    st.button("*", on_click=press, args=("*",))
-    st.button("/", on_click=press, args=("/"))
+# 2줄
+with row2[0]: st.button("4", on_click=press, args=("4",))
+with row2[1]: st.button("5", on_click=press, args=("5",))
+with row2[2]: st.button("6", on_click=press, args=("6",))
+with row2[3]: st.button("*", on_click=press, args=("*",))
+
+# 3줄
+with row3[0]: st.button("1", on_click=press, args=("1",))
+with row3[1]: st.button("2", on_click=press, args=("2",))
+with row3[2]: st.button("3", on_click=press, args=("3",))
+with row3[3]: st.button("-", on_click=press, args=("-"))
+
+# 4줄
+with row4[0]: st.button("0", on_click=press, args=("0",))
+with row4[1]: st.button(".", on_click=press, args=("."))
+with row4[2]: st.button("=", on_click=equal)
+with row4[3]: st.button("+", on_click=press, args=("+",))
 
 st.write("---")
 
-# =========================
-# 고급 연산
-# =========================
+# -------------------------
+# 공학 기능
+# -------------------------
+c1, c2, c3, c4 = st.columns(4)
 
-col5, col6, col7 = st.columns(3)
+with c1:
+    st.button("sin", on_click=press, args=("sin(",))
 
-with col5:
-    st.button("log", on_click=lambda: st.session_state.update(
-        result=str(math.log(float(st.session_state.expr) or 1))
-    ))
+with c2:
+    st.button("cos", on_click=press, args=("cos(",))
 
-with col6:
-    def diff():
-        x = sp.Symbol('x')
-        expr = sp.sympify(st.session_state.expr)
-        st.session_state.result = str(sp.diff(expr, x))
+with c3:
+    st.button("tan", on_click=press, args=("tan(",))
 
-    st.button("d/dx", on_click=diff)
+with c4:
+    st.button("√", on_click=press, args=("sqrt(",))
 
-with col7:
-    st.button("C", on_click=clear)
+c5, c6, c7, c8 = st.columns(4)
+
+with c5:
+    st.button("log", on_click=press, args=("log(",))
+
+with c6:
+    st.button("ln", on_click=press, args=("ln(",))
+
+with c7:
+    st.button("π", on_click=press, args=("pi",))
+
+with c8:
+    st.button("e", on_click=press, args=("e",))
+
+st.write("---")
+
+st.button("C (초기화)", on_click=clear)
 
 st.markdown('</div>', unsafe_allow_html=True)
