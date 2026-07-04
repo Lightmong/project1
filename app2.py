@@ -120,9 +120,6 @@ else:
 
         st.divider()
 
-        if st.button("🔄 다시하기"):
-            st.rerun()
-
         if st.button("🏠 처음으로"):
             st.session_state.game_started = False
             st.rerun()
