@@ -121,5 +121,5 @@ else:
         st.divider()
 
         if st.button("🏠 처음으로"):
-            st.session_state.game_started = False
+            st.session_state.game_started = True
             st.rerun()
